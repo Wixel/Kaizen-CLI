@@ -8,7 +8,6 @@ require 'paint'
 
 module Kaizen
   class CLI
-
     attr_reader :directory
     attr_reader :overwrite
 
@@ -30,7 +29,7 @@ module Kaizen
     end
 
     def download_archive!
-      save_to_tempfile("https://codeload.github.com/Wixel/Kaizen/zip/master")
+      save_to_tempfile('https://codeload.github.com/Wixel/Kaizen/zip/master')
     end
 
     ##
@@ -45,7 +44,7 @@ module Kaizen
         manifest = zip_file.glob('Kaizen-master/*.yml').first
 
         if manifest.nil?
-          raise ArgumentError, "The manifest object is null or non-existent"
+          raise ArgumentError, 'The manifest object is null or non-existent'
         end
 
         allowed = YAML.load(manifest.get_input_stream.read)
