@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'optparse'
-require 'kaizen.rb'
+require 'kaizen'
 
 options = {}
 OptionParser.new do |opts|
