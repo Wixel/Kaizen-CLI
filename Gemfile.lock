@@ -29,6 +29,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  bundler (~> 1.7)
   kaizen-cli!
   minitest (~> 5.7, >= 5.7.0)
   paint (~> 1.0, >= 1.0.1)
