@@ -16,5 +16,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rubyzip', '~> 1.2', '>= 1.2.0'
   s.add_development_dependency 'paint', '~> 1.0', '>= 1.0.1'
   s.add_development_dependency 'sass', '~> 3.4', '>= 3.4.22'
-
+  s.add_development_dependency 'rubocop', '~> 0.40', '>= 0.40.0'
 end
