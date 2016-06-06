@@ -5,7 +5,7 @@ Gem::Specification.new do |s|
   s.summary     = 'Kaizen CLI is the command line tool for the Kaizen framework'
   s.description = 'Kaizen is a simple-as-possible responsive Sass framework.'
   s.authors     = ['Sean Nieuwoudt', 'Nico Van Zyl']
-  s.email       = 'sean@wixelhq.com'
+  s.email       = 'team@wixelhq.com'
   s.files       = `git ls-files -z`.split("\x0")
   s.license     = 'MIT'
   s.homepage    = 'https://wixelhq.com'
