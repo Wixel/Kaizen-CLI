@@ -1,5 +1,4 @@
 require 'yaml'
-require 'pp'
 require 'tmpdir'
 require 'net/http'
 require 'uri'
@@ -110,7 +109,7 @@ module Kaizen
       when :error
         puts Paint[ps, :red]
       when :default
-        puts ps        
+        puts ps
       end
     end
 
