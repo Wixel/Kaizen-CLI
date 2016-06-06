@@ -1,0 +1,40 @@
+#!/usr/bin/env ruby
+
+require 'optparse'
+require './lib/kaizen.rb'
+
+options = {}
+OptionParser.new do |opts|
+  opts.banner = "Usage: kzn [optional path] [options]"
+
+  opts.on("-s", "--start", "Start the pre-processors for the static assets") do |v|
+    options[:start] = v
+  end
+
+  opts.on("-f", "--force", "Overwrite files that already exist in the target directory") do |v|
+    options[:overwrite] = v
+  end
+end.parse!
+
+Kaizen::CLI.pout(:default, " -------------------------------------------")
+Kaizen::CLI.pout(:default, " - 改善 Kaizen Framework")
+Kaizen::CLI.pout(:default, " - Copyright © 2016 Wixel Software Solutions")
+Kaizen::CLI.pout(:default, " - By: Nico Van Zyl, Sean Nieuwoudt")
+Kaizen::CLI.pout(:default, " -------------------------------------------")
+
+if options[:start]
+  `sass --watch scss:css --style compressed`
+else
+  if ARGV.empty?
+    Kaizen::CLI.pout(:error, "> kzn [optional path] [options]")
+    Kaizen::CLI.pout(:error, "> kzn --help")
+  else
+    overwrite = false
+
+    if options[:overwrite]
+      overwrite = true
+    end
+
+    Kaizen::CLI.new(ARGV[0], overwrite)
+  end
+end
