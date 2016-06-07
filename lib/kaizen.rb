@@ -179,7 +179,7 @@ module Kaizen
       if File.exist? path
         Kaizen::CLI.pout(:info, "Watching: #{path}")
 
-        `sass --watch #{path}/scss:#{path}/css --style compressed`
+        `sass --watch #{path}/scss:#{path}/css/ --style compressed &`
       else
         Kaizen::CLI.pout(:error, "Path does not exist: #{path}")
       end
