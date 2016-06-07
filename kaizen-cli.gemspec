@@ -1,5 +1,5 @@
 Gem::Specification.new do |s|
-  s.name        = 'kaizen'
+  s.name        = 'kaizen-cli'
   s.version     = '0.0.5'
   s.date        = '2016-06-06'
   s.summary     = 'Kaizen CLI is the command line tool for the Kaizen framework'
