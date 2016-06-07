@@ -76,7 +76,10 @@ module Kaizen
       Zip::File.open(archive.path) do |zip_file|
         manifest = zip_file.glob('Kaizen-master/*.yml').first
 
-        next if manifest.nil?
+        if manifest.nil?
+          Kaizen::CLI.pout(:error, "Manifest file 'cli.yml' not found")
+          next
+        end
 
         allowed = YAML.load(manifest.get_input_stream.read)
 
