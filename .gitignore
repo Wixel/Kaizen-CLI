@@ -36,3 +36,5 @@ build/
 .rvmrc
 .DS_Store
 Gemfile.lock
+.sass-cache/
+.sass-cache/*
