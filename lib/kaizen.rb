@@ -6,6 +6,7 @@ require 'tempfile'
 require 'zip'
 require 'paint'
 require 'bourbon'
+require 'thread'
 
 module Kaizen
   class CLI
@@ -182,7 +183,47 @@ module Kaizen
       if File.exist? path
         Kaizen::CLI.pout(:info, "Watching: #{path}")
 
-        `sass --watch #{path}/scss:#{path}/css/ --style compressed &`
+        options = {
+          :syntax     => :scss,
+          :style      => :compressed,
+          :cache    =>   false,
+          :read_cache => false
+        }
+
+        Sass::Engine::DEFAULT_OPTIONS[:load_paths].tap do |load_paths|
+          load_paths << "#{path}/scss"
+        end
+
+        css_directory = "#{path}/css"
+
+        if !File.exist?(css_directory)
+          Dir.mkdir(css_directory)
+        end
+
+        has_error = false
+
+        loop do
+          css = Sass::Engine.new(
+            File.read("#{path}/scss/main.scss"), options
+          )
+
+          begin
+            File.open("#{css_directory}/main.css", "w") do |f|
+                f.write css.render
+            end
+
+            if has_error
+              Kaizen::CLI.pout(:debug, "You fixed the issue, thanks :)")
+              has_error = false
+            end
+
+            sleep 3
+          rescue Sass::SyntaxError => e
+            Kaizen::CLI.pout(:error, e.message)
+            has_error = true
+            sleep 10
+          end
+        end
       else
         Kaizen::CLI.pout(:error, "Path does not exist: #{path}")
       end
