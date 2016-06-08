@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'kaizen-cli'
-  s.version     = '0.0.9'
+  s.version     = '0.1.0'
   s.date        = '2016-06-06'
   s.summary     = 'Kaizen CLI is the command line tool for the Kaizen framework'
   s.description = 'Kaizen is a simple-as-possible responsive Sass framework.'
@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.email       = 'team@wixelhq.com'
   s.files       = `git ls-files -z`.split("\x0")
   s.license     = 'MIT'
-  s.homepage    = 'https://wixelhq.com'
+  s.homepage    = 'https://github.com/Wixel/Kaizen'
   s.executables << 'kzn'
   s.require_paths = ['lib']
 
