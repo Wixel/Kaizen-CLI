@@ -1,2 +1,2 @@
 # Kaizen-CLI
-A Ruby Gem for the Kaizen front end framework
+A Ruby Gem for the [Kaizen Front-end Framework](http://wixel.github.io/Kaizen/)
