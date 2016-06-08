@@ -29,8 +29,10 @@ begin
 
   year = Date.today.strftime("%Y")
 
+  kanji = "改善"
+
   Kaizen::CLI.pout(:default, "============================================")
-  Kaizen::CLI.pout(:default, "+ 改善 Kaizen Framework                      ")
+  Kaizen::CLI.pout(:default, "+ #{Paint[kanji, :cyan]} Kaizen Framework    ")
   Kaizen::CLI.pout(:default, "+ Copyright © #{year} Wixel Software Solutions ")
   Kaizen::CLI.pout(:default, "+ https://github.com/Wixel/Kaizen           ")
   Kaizen::CLI.pout(:default, "============================================")
