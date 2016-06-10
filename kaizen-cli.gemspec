@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = 'kaizen-cli'
-  s.version     = '0.1.0'
+  s.version     = '0.1.1'
   s.date        = '2016-06-06'
   s.summary     = 'Kaizen CLI is the command line tool for the Kaizen framework'
   s.description = 'Kaizen is a simple-as-possible responsive Sass framework.'
@@ -12,6 +12,7 @@ Gem::Specification.new do |s|
   s.executables << 'kzn'
   s.require_paths = ['lib']
 
+  s.add_runtime_dependency 'rack', '~> 1.6', '>= 1.6.4'
   s.add_runtime_dependency 'minitest', '~> 5.7', '>= 5.7.0'
   s.add_runtime_dependency 'rake', '~> 10.4', '>= 10.4.2'
   s.add_runtime_dependency 'bundler', '~> 1.7'

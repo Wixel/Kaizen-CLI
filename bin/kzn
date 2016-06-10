@@ -1,21 +1,39 @@
 #!/usr/bin/env ruby
 
+require 'rubygems'
 require 'optparse'
-require 'kaizen'
 require 'date'
+require 'thread'
+require File.expand_path('../lib/kaizen', File.dirname(__FILE__))
+
+def render_banner!
+  Kaizen::CLI.pout(:default, '> kzn [optional path] [options]')
+  Kaizen::CLI.pout(:default, '> kzn --help')
+end
+
+threads = []
 
 begin
   options = {
-    watch:     false,
     overwrite: false,
-    verbose:   false
+    verbose:   false,
+    serve:     false,
+    mode:      nil
   }
 
   OptionParser.new do |opts|
     opts.banner = 'Usage: kzn [optional path] [options]'
 
-    opts.on('-s', '--start', 'Start the pre-processors for the static assets') do |v|
-      options[:watch] = v
+    opts.on('-w', '--watch', 'Watch the specified directory for Sass changes and compile them automatically') do |v|
+      options[:mode] = :watch
+    end
+
+    opts.on('-n', '--new', 'Create a new Kaizen project in the specified directory') do |v|
+      options[:mode] = :new
+    end
+
+    opts.on('-s', '--serve', 'Start serving the specified directory from the built-in web server') do |v|
+      options[:serve] = v
     end
 
     opts.on('-f', '--force', 'Overwrite files that already exist in the target directory') do |v|
@@ -34,27 +52,50 @@ begin
   Kaizen::CLI.pout(:default, "============================================")
   Kaizen::CLI.pout(:default, "+ #{Paint[kanji, :cyan]} Kaizen Framework    ")
   Kaizen::CLI.pout(:default, "+ Copyright © #{year} Wixel Software Solutions ")
-  Kaizen::CLI.pout(:default, "+ https://github.com/Wixel/Kaizen           ")
+  Kaizen::CLI.pout(:default, "+ http://wixel.github.io/Kaizen/            ")
   Kaizen::CLI.pout(:default, "============================================")
 
-  if options[:watch]
-    path = Dir.pwd
+  path = Dir.pwd
 
-    if !ARGV.empty?
-      path = ARGV[0]
+  if !ARGV.empty?
+    path = ARGV[0]
+  end
+
+  serving = false
+
+  case options[:mode]
+  when :new
+    Kaizen::CLI.new(ARGV[0], options[:overwrite], options[:verbose])
+  when :watch
+    if options[:serve]
+      serving = true
+
+      threads << Thread.new do
+        Kaizen::CLI.serve(path)
+      end
     end
 
     Kaizen::CLI.watch(path)
-  end
-
-  if !options[:watch]
-    if ARGV.empty?
-      Kaizen::CLI.pout(:default, '> kzn [optional path] [options]')
-      Kaizen::CLI.pout(:default, '> kzn --help')
-    else
-      Kaizen::CLI.new(ARGV[0], options[:overwrite], options[:verbose])
+  else
+    if !options[:serve]
+      render_banner!
     end
   end
-rescue SignalException => e
-  Kaizen::CLI.pout(:debug, "お疲れ様でした (おつかれさまでした, otsukaresama deshita!")
+
+  if options[:serve] && !serving
+    serving = true
+    Kaizen::CLI.serve(path)
+  end
+
+rescue SignalException, Exception => e
+
+  if threads.size > 0
+    Kaizen::CLI.pout(:info, "Cleaning up worker threads")
+
+    threads.each do |t|
+      Thread.kill(t)
+    end
+  end
+
+  Kaizen::CLI.pout(:debug, "otsukaresama deshita! (Good Bye)")
 end

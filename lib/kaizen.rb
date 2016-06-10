@@ -1,3 +1,4 @@
+require 'rubygems'
 require 'yaml'
 require 'tmpdir'
 require 'net/http'
@@ -6,7 +7,7 @@ require 'tempfile'
 require 'zip'
 require 'paint'
 require 'bourbon'
-require 'thread'
+require 'rack'
 
 module Kaizen
   class CLI
@@ -158,17 +159,17 @@ module Kaizen
     # Output helper
     #
     def self.pout(optn, msg)
-      format = '%d/%m/%Y %H:%M'
+      date_format = '%d/%m/%Y %H:%M'
 
       case optn
       when :error
-        puts "#{Time.now.strftime(format)} #{Paint[msg, :red]}"
+        puts "#{Time.now.strftime(date_format)} #{Paint[msg, :red]}"
       when :info
-        puts "#{Time.now.strftime(format)} #{Paint[msg, :green]}"
+        puts "#{Time.now.strftime(date_format)} #{Paint[msg, :green]}"
       when :warn
-        puts "#{Time.now.strftime(format)} #{Paint[msg, :yellow]}"
+        puts "#{Time.now.strftime(date_format)} #{Paint[msg, :yellow]}"
       when :debug
-        puts "#{Time.now.strftime(format)} #{Paint[msg, :cyan]}"
+        puts "#{Time.now.strftime(date_format)} #{Paint[msg, :cyan]}"
       when :default
         puts msg
       end
@@ -180,7 +181,7 @@ module Kaizen
     def self.watch(path)
       path = File.expand_path(path)
 
-      if File.exist? path
+      CLI.path_exists?(path) do
         Kaizen::CLI.pout(:info, "Watching: #{path}")
 
         options = {
@@ -202,32 +203,154 @@ module Kaizen
 
         has_error = false
 
-        loop do
-          css = Sass::Engine.new(
-            File.read("#{path}/scss/main.scss"), options
-          )
+        main_file = "#{path}/scss/main.scss"
 
-          begin
-            File.open("#{css_directory}/main.css", "w") do |f|
+        CLI.path_exists?(main_file) do
+          loop do
+            css = Sass::Engine.new(File.read(main_file), options)
+
+            begin
+              File.open("#{css_directory}/main.css", "w") do |f|
                 f.write css.render
-            end
+              end
 
-            if has_error
-              Kaizen::CLI.pout(:debug, "You fixed the issue, thanks :)")
-              has_error = false
-            end
+              if has_error
+                Kaizen::CLI.pout(:debug, "You fixed the issue, thanks :)")
+                has_error = false
+              end
 
-            sleep 3
-          rescue Sass::SyntaxError => e
-            Kaizen::CLI.pout(:error, e.message)
-            has_error = true
-            sleep 10
+              sleep 3
+            rescue Sass::SyntaxError => e
+              Kaizen::CLI.pout(:error, e.message)
+              has_error = true
+              sleep 10
+            end
           end
         end
-      else
-        Kaizen::CLI.pout(:error, "Path does not exist: #{path}")
       end
     end
 
+    ##
+    # Serve the specified path via the web server
+    #
+    def self.serve(path)
+      path = File.expand_path(path)
+
+      CLI.path_exists?(path) do
+        Kaizen::KZNServer.set_load_path(path)
+
+        Rack::Server.start({
+          :app  => Kaizen::KZNServer,
+          :Port => 9191
+        })
+      end
+    end
+
+    ##
+    # Helper to clean up path checking
+    #
+    def self.path_exists?(path)
+      if File.exist? path
+        yield
+      else
+        Kaizen::CLI.pout(:error, "'#{path}' does not exist")
+      end
+    end
+  end
+
+  class KZNServer
+
+    def self.set_load_path(p)
+      @@server_path = p
+    end
+
+    def self.request_path(path)
+      parts = path.split('/')
+
+      if parts.size == 0
+        parts << "index.html"
+      end
+
+      return "#{@@server_path}/#{parts.join('/')}"
+    end
+
+    def self.mime_for(file)
+      supported_mimes = {
+        ".avi"   => :"video/x-msvideo",
+        ".bmp"   => :"image/bmp",
+        ".css"   => :"text/css",
+        ".csv"   => :"text/csv",
+        ".doc"   => :"application/msword",
+        ".docm"  => :"application/vnd.ms-word.document.macroEnabled.12",
+        ".docx"  => :"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ".flv"   => :"video/x-flv",
+        ".gz"    => :"application/x-gzip",
+        ".htm"   => :"text/html",
+        ".html"  => :"text/html",
+        ".ico"   => :"image/x-icon",
+        ".jpe"   => :"image/jpeg",
+        ".jpeg"  => :"image/jpeg",
+        ".jpg"   => :"image/jpeg",
+        ".js"    => :"application/x-javascript",
+        ".m4a"   => :"audio/m4a",
+        ".m4v"   => :"video/x-m4v",
+        ".mov"   => :"video/quicktime",
+        ".movie" => :"video/x-sgi-movie",
+        ".mp2"   => :"video/mpeg",
+        ".mp2v"  => :"video/mpeg",
+        ".mp3"   => :"audio/mpeg",
+        ".mp4"   => :"video/mp4",
+        ".mp4v"  => :"video/mp4",
+        ".mpa"   => :"video/mpeg",
+        ".mpeg"  => :"video/mpeg",
+        ".mpg"   => :"video/mpeg",
+        ".png"   => :"image/png",
+        ".rar"   => :"application/octet-stream",
+        ".tar"   => :"application/x-tar",
+        ".tif"   => :"image/tiff",
+        ".tiff"  => :"image/tiff",
+        ".ttf"   => :"application/octet-stream",
+        ".tts"   => :"video/vnd.dlna.mpeg-tts",
+        ".txt"   => :"text/plain",
+        ".wav"   => :"audio/wav",
+        ".wsdl"  => :"text/xml",
+        ".xhtml" => :"application/xhtml+xml",
+        ".xml"   => :"text/xml",
+        ".xsd"   => :"text/xml",
+        ".xsf"   => :"text/xml",
+        ".xsl"   => :"text/xml",
+        ".xslt"  => :"text/xml",
+        ".xsn"   => :"application/octet-stream",
+        ".zip"   => :"application/x-zip-compressed"
+      }
+
+      ext = File.extname(file)
+
+      if supported_mimes.key?(ext)
+        supported_mimes[ext].to_s
+      else
+        'text/html'
+      end
+    end
+
+    def self.call(env)
+      requested_file = request_path(Rack::Request.new(env).path)
+
+      response = Rack::Response.new
+
+      response['Content-Type']  = mime_for(requested_file)
+      response['Cache-Control'] = "no-cache, no-store, must-revalidate"
+      response['Pragma']        = "no-cache"
+      response['Expires']       = "0"
+
+      if File.file?(requested_file)
+        response.write(File.read(requested_file))
+        response.status = 200
+      else
+        response.status = 404
+      end
+
+      response.finish
+    end
   end
 end
