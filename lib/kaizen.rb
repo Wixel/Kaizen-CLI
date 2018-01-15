@@ -120,7 +120,7 @@ module Kaizen
       Zip::File.open(archive.path) do |zip_file|
         zip_file.each do |f|
           if f.name == "normalize.css-master/normalize.css"
-            path = File.join(@directory, 'scss/vendor/normalize.scss')
+            path = File.join(@directory, 'scss/vendor/_normalize.scss')
             begin
               zip_file.extract(f, path) if !File.exist? path
             rescue Exception => e
