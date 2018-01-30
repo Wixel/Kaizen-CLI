@@ -21,6 +21,6 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency 'paint', '~> 1.0', '>= 1.0.1'
   s.add_runtime_dependency 'sass', '~> 3.4', '>= 3.4.22'
   s.add_runtime_dependency 'bourbon', '~> 4.2', '>= 4.2.7'
-  s.add_development_dependency 'rubocop', '~> 0.40', '>= 0.40.0'
+  s.add_development_dependency 'rubocop', '~> 0.49.0', '>= 0.49.0'
 
 end
