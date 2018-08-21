@@ -1,17 +1,17 @@
 # Kaizen-CLI
 A Ruby Gem for the [Kaizen Front-end Framework](http://wixel.github.io/Kaizen/)
 
-##Installation
+## Installation
 
 ```sh
 gem install kaizen-cli
 ```
 
-####Requirements
+#### Requirements
 
 - **[Ruby](https://www.ruby-lang.org/)**
 
-####Getting started
+#### Getting started
 
 - Run: `kzn [directory] -n` - Create a new Kaizen project in the specified directory
 - Run: `kzn [directory] -f` - Overwrite files that already exist in the target directory
